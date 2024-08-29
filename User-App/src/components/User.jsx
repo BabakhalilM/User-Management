@@ -31,7 +31,7 @@ const FetchingData = () => {
   const handleSave = async (_id) => {
     try {
       const updatedEmployee = emp.find(employee => employee._id === _id);
-      const responce=await axios.put('/edituser', updatedEmployee);
+      const response=await axios.put('/edituser', updatedEmployee);
       console.log(response);
       setEditRow(null);
     } catch (err) {
