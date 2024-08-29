@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
 import axios from './api';
 import {
   FormControl,
@@ -7,7 +6,6 @@ import {
   Button,
   Input,
   VStack,
-  useToast,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -17,15 +15,18 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@chakra-ui/react';
+import { Apicontext } from './contextapi';
 
 const Register = () => {
   const [firstname, setFirstName] = useState('');
   const [lastname, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const toast = useToast();
-//   const navigate = useNavigate();
+  
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const {
+     getData }=useContext(Apicontext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +35,7 @@ const Register = () => {
       console.log(response);
       toast({
         title: 'Registration successful!',
-        description: "You can now log in.",
+        description: "Data is added to DataBase.",
         status: 'success',
         duration: 2000,
         isClosable: true,
@@ -44,10 +45,7 @@ const Register = () => {
       setLastName('');
       setEmail('');
       setPassword('');
-
-    //   setTimeout(() => {
-    //     navigate('/login');
-    //   }, 1000);
+      getData();
     } catch (err) {
       toast({
         title: 'Registration failed.',
@@ -62,7 +60,7 @@ const Register = () => {
 
   return (
     <>
-      <Button onClick={onOpen} colorScheme="green">Add user</Button>
+      <Button onClick={onOpen} m={4} colorScheme="green">Add user</Button>
       <Modal isCentered isOpen={isOpen} onClose={onClose}>
         <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(10px) hue-rotate(90deg)' />
         <ModalContent>

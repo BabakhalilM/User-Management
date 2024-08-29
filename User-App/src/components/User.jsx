@@ -1,76 +1,68 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from './api';
 import { Box, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, Input } from '@chakra-ui/react';
+import { Apicontext } from './contextapi';
 
 const FetchingData = () => {
-  const [emp, setEmp] = useState([]);
-  const [editRow, setEditRow] = useState(null);
-  const [deleteUsers, setDeleteUsers] = useState([]);
+    const [editRow, setEditRow] = useState(null);
+    const [deleteUsers, setDeleteUsers] = useState([]);
+    const {emp,setEmp,getData}=useContext(Apicontext);
+    
+    useEffect(() => {
+        getData();
+    });
 
-  useEffect(() => {
-    async function getData() {
-      try {
-        const response = await axios.get("/users");
-        setEmp(response.data.usersData);
-      } catch (err) {
-        console.log("Error fetching data", err);
-      }
-    }
-    getData();
-  }, []);
+    const handleEdit = (employee) => {
+        setEditRow(employee._id);
+    };
+    const handleChange = (e, _id, field) => {
+        setEmp(emp.map(employee =>
+            employee._id === _id ? { ...employee, [field]: e.target.value } : employee
+        ));
+    };
 
-  const handleEdit = (employee) => {
-    setEditRow(employee._id);
-  };
-  const handleChange = (e, _id, field) => {
-    setEmp(emp.map(employee =>
-      employee._id === _id ? { ...employee, [field]: e.target.value } : employee
-    ));
-  };
+    const handleSave = async (_id) => {
+        try {
+            const updatedEmployee = emp.find(employee => employee._id === _id);
+            const response = await axios.put('/edituser', updatedEmployee);
+            console.log(response);
+            setEditRow(null);
+        } catch (err) {
+            console.log("Error saving data", err);
+        }
+    };
 
-  const handleSave = async (_id) => {
-    try {
-      const updatedEmployee = emp.find(employee => employee._id === _id);
-      const response=await axios.put('/edituser', updatedEmployee);
-      console.log(response);
-      setEditRow(null);
-    } catch (err) {
-      console.log("Error saving data", err);
-    }
-  };
+    const handleCancel = () => {
+        setEditRow(null);
+    };
 
-  const handleCancel = () => {
-    setEditRow(null);
-  };
+    const handleDelete = async (_id) => {
+        try {
+            console.log("delete id sending", _id);
+            const response = await axios.delete(`/deleteuser/:${_id}`);
+            console.log(response);
+            setEmp(emp.filter(employee => employee._id !== _id));
+        } catch (err) {
+            console.log("Error deleting data", err);
+        }
+    };
 
-  const handleDelete = async (_id) => {
-    try {
-        console.log( "delete id sending",_id);
-      const response=await axios.delete(`/deleteuser/:${_id}`);
-        console.log(response);
-      setEmp(emp.filter(employee => employee._id !== _id));
-    } catch (err) {
-      console.log("Error deleting data", err);
-    }
-  };
+    const handleDeleteUsers = async () => {
+        try {
+            const response = await axios.post('/deleteusers', { deleteUsers });
+            console.log(response);
+            setEmp(emp.filter(employee => !deleteUsers.includes(employee._id)));
+            setDeleteUsers([]);
+        } catch (err) {
+            console.log("Error deleting multiple users", err);
+        }
+    };
 
-  const handleDeleteUsers = async () => {
-    try {
-      const response=await axios.post('/deleteusers', { deleteUsers });
-      console.log(response);
-      setEmp(emp.filter(employee => !deleteUsers.includes(employee._id)));
-      setDeleteUsers([]);
-    } catch (err) {
-      console.log("Error deleting multiple users", err);
-    }
-  };
-
-  const selectChange = (_id) => {
-    setDeleteUsers(prevState =>
-      prevState.includes(_id) ? prevState.filter(id => id !== _id) : [...prevState, _id]
-    );
-  };
-
+    const selectChange = (_id) => {
+        setDeleteUsers(prevState =>
+            prevState.includes(_id) ? prevState.filter(id => id !== _id) : [...prevState, _id]
+        );
+    };
   return (
     <Box p={4}>
         {deleteUsers.length > 0 && (
