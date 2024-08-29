@@ -14,6 +14,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { Apicontext } from './contextapi';
 
@@ -22,7 +23,7 @@ const Register = () => {
   const [lastname, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const {
